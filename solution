@@ -1,0 +1,86 @@
+5. Resource limits
+Clone the following git repository
+https://git.lab14.example.com/git/resource.git
+Perform the following tasks inside this repository
+--> There is already one updated playbook in the repo -->install_vim.yml
+--> Create a playbook resource.yml and the playbook should do the following tasks, this tasks should be executed in localhost only
+	--> install cgroup, where student user is the owner and group owner with relative resource named: ex447_stats
+	--> relative resource should be assigned to capture the information of 
+		--> pids
+		--> cpuacct
+		--> memory 
+--> once the cgroup is created , execute the control group along with execution of install_vim.yml which provides cpuacct,memory and pids of the playbook execution.
+--> Make all necessary modification in the ansible configuration file.
+
+Once all configuration file and playbook is created and executed, upload and commit the latest updates to remote repository
+
+Answer:
+
+		# cd /home/admin/git-repos
+
+		# git clone <git url>
+
+		# cd cgroup-project
+
+		# sudo yum install libcgroup-tools -y
+		
+		#  ansible-doc -t callback cgroup_perf_recap	( to get cgcreate command FROM NOTES SECTION )
+		
+		# sudo cgcreate -a devops:devops  -t devops:devops  -g cpuacct,memory,pids:cgroup
+		
+---
+- name: Create custom group
+	hosts: localhost
+	gather_facts: no
+	tasks:
+		- name: Creating cgroup EX447_profile
+			shell: "cgcreate -a admin:admin -t admin:admin -g cpuacct,memory,pids:EX447_profile"
+
+    
+    
+    
+		# vi  ansible.cfg
+		[defaults]
+		callback_whitelist = timer, cgroup_perf_recap
+
+		[callback_cgroup_perf_recap]
+		control_group=cgroup 	#name of cgroup 
+
+		
+		# vi  vim.yml 	
+		
+		# man cgexec
+		
+		#  cgexec -g cpuacct,memory,pids:cgroup ansible-playbook vim.yml
+    
+    
+    
+    ==============================================================================
+    
+    
+    
+              
+3. Create a playbook for knowing playbook run statistics using cgroups and cgroup_perf_recap
+
+---
+- name: Create custom group
+	hosts: localhost
+	gather_facts: no
+	tasks:
+		- name: Creating cgroup EX447_profile
+			shell: "cgcreate -a admin:admin -t admin:admin -g cpuacct,memory,pids:EX447_profile"
+
+
+Make following changes in ansible config file
+cat ansible.cfg
+[defaults]
+inventory=inventory
+remote_user=admin
+callback_whitelist=cgroup_perf_recap
+
+[callback_cgroup_perf_recap]
+control_group=EX447_profile
+
+Run command to check if its working
+cgexec -g cpuacct,memory,pids:ansible_profile ansible-playbook install_vim.yml
+
