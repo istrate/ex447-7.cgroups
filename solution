@@ -45,8 +45,7 @@ SOLUTION :
 [defaults]
 callback_whitelist = timer, cgroup_perf_recap    ##cat /etc/ansible/ansible.cfg   --> we this is from ansible.cgf file also
 [callback_cgroup_perf_recap]
-control_group=cgroup 	#name of cgroup 
-
+control_group=ex447_stats 	#name of cgroup 
 
 
 
@@ -62,46 +61,17 @@ control_group=cgroup 	#name of cgroup
       
       
       
-
 [ansible@ansible cgroup]$ cat execute.yml 
 ---
 - name: controll groups
   hosts: localhost
   tasks:
     - name: execution
-      command: cgexec -g cpuacct,memory,pids:ex447_stats ansible-playbook resource.yml
+      command: cgexec -g cpuacct,memory,pids:ex447_stats ansible-playbook resource.yml  ## man cgexec  --- to get the command
       register: output
     - debug:
         var: output
 
 ===================================================================================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		
