@@ -1,6 +1,15 @@
-5. Resource limits
-Clone the following git repository
-https://git.lab14.example.com/git/resource.git
+QUESTION .
+=============
+Create control group.clone the project from git link.
+	control group name is cgroup.
+	all files owned user or group for the control group: admin
+	controllers - cpuacct,memory,pid
+	playbook name vim.yml which will install a vim application.
+	playbook should pint the time.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+5. Resource limits -
+Clone the  git repository
 Perform the following tasks inside this repository
 --> There is already one updated playbook in the repo -->install_vim.yml
 --> Create a playbook resource.yml and the playbook should do the following tasks, this tasks should be executed in localhost only
@@ -14,73 +23,85 @@ Perform the following tasks inside this repository
 
 Once all configuration file and playbook is created and executed, upload and commit the latest updates to remote repository
 
-Answer:
+SOLUTION :
+==================
 
-		# cd /home/admin/git-repos
+# cd /home/admin/git-repos
+# git clone <git url>
+# cd cgroup-project
 
-		# git clone <git url>
+# sudo yum install libcgroup-tools -y
 
-		# cd cgroup-project
-
-		# sudo yum install libcgroup-tools -y
-		
-		#  ansible-doc -t callback cgroup_perf_recap	( to get cgcreate command FROM NOTES SECTION )
-		
-		# sudo cgcreate -a devops:devops  -t devops:devops  -g cpuacct,memory,pids:cgroup
-		
----
-- name: Create custom group
-	hosts: localhost
-	gather_facts: no
-	tasks:
-		- name: Creating cgroup EX447_profile
-			shell: "cgcreate -a admin:admin -t admin:admin -g cpuacct,memory,pids:EX447_profile"
-
-    
-    
-    
-		# vi  ansible.cfg
-		[defaults]
-		callback_whitelist = timer, cgroup_perf_recap
-
-		[callback_cgroup_perf_recap]
-		control_group=cgroup 	#name of cgroup 
-
-		
-		# vi  vim.yml 	
-		
-		# man cgexec
-		
-		#  cgexec -g cpuacct,memory,pids:cgroup ansible-playbook vim.yml
-    
-    
-    
-    ==============================================================================
-    
-    
-    
-              
-3. Create a playbook for knowing playbook run statistics using cgroups and cgroup_perf_recap
-
----
-- name: Create custom group
-	hosts: localhost
-	gather_facts: no
-	tasks:
-		- name: Creating cgroup EX447_profile
-			shell: "cgcreate -a admin:admin -t admin:admin -g cpuacct,memory,pids:EX447_profile"
+# ansible-doc -t ##press enter then from these you can see callback keyword
+# ansible-doc -t callback -l
+#  ansible-doc -t callback cgroup_perf_recap	( to get cgcreate command FROM NOTES SECTION )
 
 
-Make following changes in ansible config file
-cat ansible.cfg
+==================================================================================================================
+
+
+# vi  ansible.cfg
+-------------------------
 [defaults]
-inventory=inventory
-remote_user=admin
-callback_whitelist=cgroup_perf_recap
-
+callback_whitelist = timer, cgroup_perf_recap    ##cat /etc/ansible/ansible.cfg   --> we this is from ansible.cgf file also
 [callback_cgroup_perf_recap]
-control_group=EX447_profile
+control_group=cgroup 	#name of cgroup 
 
-Run command to check if its working
-cgexec -g cpuacct,memory,pids:ansible_profile ansible-playbook install_vim.yml
 
+
+
+
+[ansible@ansible cgroup]$ cat resource.yml 
+---
+- name: controll groups
+  hosts: localhost
+  tasks:
+    - name: creating the cgroup
+      shell: cgcreate -a rohit:rohit -t rohit:rohit -g cpuacct,memory,pids:ex447_stats 
+      
+      
+      
+      
+
+[ansible@ansible cgroup]$ cat execute.yml 
+---
+- name: controll groups
+  hosts: localhost
+  tasks:
+    - name: execution
+      command: cgexec -g cpuacct,memory,pids:ex447_stats ansible-playbook resource.yml
+      register: output
+    - debug:
+        var: output
+
+===================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
