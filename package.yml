@@ -1,0 +1,8 @@
+---
+- name: Install vim
+  hosts: all
+  tasks:
+    - name: Make sure vim is installed
+      yum:
+        name: vim
+        state: latest
