@@ -1,0 +1,13 @@
+---
+- name: Profile execution
+  hosts: localhost
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Execute profiling
+      command: cgexec -g cpuacct,memory,pids:stats ansible-playbook vim.yml
+      register: output
+    
+    - name: Show stats
+      debug:
+        var: output
