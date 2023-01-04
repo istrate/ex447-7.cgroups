@@ -1,13 +1,22 @@
 ---
-- name: Profile execution
+- name: Performance profiling
   hosts: localhost
-  gather_facts: false
-  become: false
+  become: false #required to run cgexec on localhost
   tasks:
-    - name: Execute profiling
-      command: cgexec -g cpuacct,memory,pids:stats ansible-playbook vim.yml
+    - name: Install cgroup tools
+      yum:
+        name: libcgroup-tools
+        state: present
+      become: true #required so that package can be installed 
+
+    - name: Create ex447-stats group
+      shell: cgcreate -a ansible:ansible -t ansible:ansible -g cpuacct,memory,pids:ex447_stats
+      become: true #required to be executed as root and not use sudo in shell command
+
+    - name: Perform profiling
+      shell: cgexec -g cpuacct,memory,pids:ex447_stats ansible-playbook package.yml
       register: output
-    
-    - name: Show stats
+
+    - name: Show profiling
       debug:
-        var: output
+        var: output.stdout_lines
